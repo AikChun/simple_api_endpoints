@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from rest_framework.urlpatterns import format_suffix_patterns
+from object_app import views
 
 urlpatterns = [
+    url(r'^object/$', views.GenericObjectList.as_view()),
+    url(r'^object/?P(<timestamp>.*)/$', views.GenericObjectList.as_view()),
     url(r'^admin/', admin.site.urls),
 ]
