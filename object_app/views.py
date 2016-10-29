@@ -12,15 +12,14 @@ class GenericObjectList(APIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    renderer_classes = (JSONRenderer, )
     
     def get(self, request, format=None):
-        queryset = GenericObject.objects.all()
+        queryset   = GenericObject.objects.all()
         serializer = GenericObjectSerializer(queryset, many=True)
         return Response(serializer.data)
     
     def post(self, request, format=None):
-        request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
+        #request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
 
         serializer = GenericObjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -38,12 +37,13 @@ class GenericObjectDetail(APIView):
 
         timestamp = self.request.query_params.get('timestamp', None)
         if timestamp is not None:
-            queryset = queryset.filter(timestamp__lte=timestamp)
+            timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
+            queryset = queryset.filter(created_at__lte=timestamp)
 
         if not queryset.count():
             raise Http404
 
-        queryset = queryset.order_by('-timestamp')[0]
+        queryset = queryset.order_by('-created_at')[0]
 
         serializer = GenericObjectSerializer(queryset)
 
