@@ -9,6 +9,12 @@ import json
 class GenericObjectAPITests(APITestCase):
 
     def test_post_data(self):
-        data = {'mykey': 'Dorne', 'value': 'House Martell', 'timestamp': '2016-10-26T16:30:30'}
+        #data = {'mykey': 'Dorne', 'value': 'House Martell', 'timestamp': '2016-10-26T16:30:30'}
+        
+        data = {'mykey': 'Dorne', 'value': 'House Martell', 'timestamp': '1477645225'}
         response = self.client.post('/object/', data, format='json')
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_get_data(self):
+        response = self.client.get('/object/')
+        self.assertEqual(status.HTTP_200_OK, response.status_code)

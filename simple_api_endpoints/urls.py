@@ -20,6 +20,6 @@ from object_app import views
 
 urlpatterns = [
     url(r'^object/$', views.GenericObjectList.as_view()),
-    url(r'^object/?P(<timestamp>.*)/$', views.GenericObjectList.as_view()),
+    url(r'^object/(?P<mykey>.*)/', views.GenericObjectDetail.as_view()),
     url(r'^admin/', admin.site.urls),
 ]
