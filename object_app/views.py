@@ -20,7 +20,6 @@ class GenericObjectList(APIView):
     
     def post(self, request, format=None):
         #request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
-
         serializer = GenericObjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -38,6 +37,7 @@ class GenericObjectDetail(APIView):
         timestamp = self.request.query_params.get('timestamp', None)
         if timestamp is not None:
             timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
+            print(timestamp)
             queryset = queryset.filter(created_at__lte=timestamp)
 
         if not queryset.count():
