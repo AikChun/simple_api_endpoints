@@ -6,17 +6,24 @@ from rest_framework import status
 from django.http import Http404
 from datetime import datetime
 from rest_framework.renderers import JSONRenderer
+from django.http import HttpResponse
+from django.template import Context, loader 
+
 # Create your views here.
+def index(request):
+
+    template = loader.get_template('index.html')
+    return HttpResponse(template.render())
 
 class GenericObjectList(APIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
     
-    #def get(self, request, format=None):
-    #    queryset   = GenericObject.objects.all()
-    #    serializer = GenericObjectSerializer(queryset, many=True)
-    #    return Response(serializer.data)
+    def get(self, request, format=None):
+        queryset   = GenericObject.objects.all()
+        serializer = GenericObjectSerializer(queryset, many=True)
+        return Response(serializer.data)
     
     def post(self, request, format=None):
         #request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
