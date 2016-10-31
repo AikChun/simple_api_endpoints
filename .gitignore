@@ -3,4 +3,5 @@ db.sqlite3
 simple_api_endpoints/__pycache__
 simple_api_endpoints/__pycache__/*
 *.swp
+static/
 
