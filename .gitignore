@@ -1,6 +1,6 @@
+settings.py
 db.sqlite3
 *.pyc
 simple_api_endpoints/__pycache__
 simple_api_endpoints/__pycache__/*
 *.swp
-

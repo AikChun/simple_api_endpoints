@@ -13,10 +13,10 @@ class GenericObjectList(APIView):
     API endpoint that allows users to be viewed or edited.
     """
     
-    def get(self, request, format=None):
-        queryset   = GenericObject.objects.all()
-        serializer = GenericObjectSerializer(queryset, many=True)
-        return Response(serializer.data)
+    #def get(self, request, format=None):
+    #    queryset   = GenericObject.objects.all()
+    #    serializer = GenericObjectSerializer(queryset, many=True)
+    #    return Response(serializer.data)
     
     def post(self, request, format=None):
         #request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
@@ -37,7 +37,6 @@ class GenericObjectDetail(APIView):
         timestamp = self.request.query_params.get('timestamp', None)
         if timestamp is not None:
             timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
-            print(timestamp)
             queryset = queryset.filter(created_at__lte=timestamp)
 
         if not queryset.count():
