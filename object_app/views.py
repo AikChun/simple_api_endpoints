@@ -6,7 +6,14 @@ from rest_framework import status
 from django.http import Http404
 from datetime import datetime
 from rest_framework.renderers import JSONRenderer
+from django.http import HttpResponse
+from django.template import Context, loader 
+
 # Create your views here.
+def index(request):
+
+    template = loader.get_template('index.html')
+    return HttpResponse(template.render())
 
 class GenericObjectList(APIView):
     """
@@ -37,7 +44,6 @@ class GenericObjectDetail(APIView):
         timestamp = self.request.query_params.get('timestamp', None)
         if timestamp is not None:
             timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
-            print(timestamp)
             queryset = queryset.filter(created_at__lte=timestamp)
 
         if not queryset.count():
