@@ -3,6 +3,7 @@ Django==1.9.10
 django-rest-swagger==2.0.7
 django-unixdatetimefield==0.1.4
 djangorestframework==3.5.1
+gunicorn==19.6.0
 httpie==0.9.6
 itypes==1.1.0
 openapi-codec==1.1.7
