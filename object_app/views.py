@@ -6,7 +6,7 @@ from rest_framework import status
 from django.http import Http404
 from datetime import datetime
 from rest_framework.renderers import JSONRenderer
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.template import Context, loader 
 
 # Create your views here.
@@ -27,11 +27,28 @@ class GenericObjectList(APIView):
     
     def post(self, request, format=None):
         #request.data['timestamp'] = datetime.utcfromtimestamp(int(request.data['timestamp'])).isoformat()
-        serializer = GenericObjectSerializer(data=request.data)
+        if len(request.data) != 1:
+            return  HttpResponseBadRequest('<h1>Bad Request</h1>')
+
+        post_data = request.data
+        mapped_data = self.map_post_data(post_data)
+
+
+        serializer = GenericObjectSerializer(data=mapped_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def map_post_data(self, data):
+        result = {}
+
+        for key, value in data.items():
+            result['mykey'] = key
+            result['value'] = value
+
+
+        return result
 
 class GenericObjectDetail(APIView):
     """
