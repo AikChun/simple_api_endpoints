@@ -4,4 +4,4 @@ from rest_framework import serializers
 class GenericObjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model  = GenericObject
-        fields = ('mykey', 'value', 'created_at', 'updated_at')
+        fields = ('mykey', 'value', 'created_at')

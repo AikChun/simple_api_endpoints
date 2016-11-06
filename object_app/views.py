@@ -1,13 +1,14 @@
-from .serializers import GenericObjectSerializer
 from .models import GenericObject
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.http import Http404
+from .serializers import GenericObjectSerializer
 from datetime import datetime
-from rest_framework.renderers import JSONRenderer
+from django.http import Http404
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.template import Context, loader 
+from rest_framework import status
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+import time
 
 # Create your views here.
 def index(request):
@@ -30,7 +31,7 @@ class GenericObjectList(APIView):
         if len(request.data) != 1:
             return  HttpResponseBadRequest('<h1>Bad Request</h1>')
 
-        post_data = request.data
+        post_data   = request.data
         mapped_data = self.map_post_data(post_data)
 
 
@@ -47,7 +48,6 @@ class GenericObjectList(APIView):
             result['mykey'] = key
             result['value'] = value
 
-
         return result
 
 class GenericObjectDetail(APIView):
@@ -56,18 +56,40 @@ class GenericObjectDetail(APIView):
     """
     renderer_classes = (JSONRenderer, )
     def get(self, request, mykey, format=None):
-        queryset = GenericObject.objects.filter(mykey=mykey)
-
+        queryset  = GenericObject.objects.filter(mykey=mykey)
         timestamp = self.request.query_params.get('timestamp', None)
+
         if timestamp is not None:
             timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
-            queryset = queryset.filter(created_at__lte=timestamp)
+            queryset  = queryset.filter(created_at__lte=timestamp)
 
         if not queryset.count():
             raise Http404
 
-        queryset = queryset.order_by('-created_at')[0]
+        queryset   = queryset.order_by('-created_at')[0]
 
         serializer = GenericObjectSerializer(queryset)
 
-        return Response(serializer.data)
+        print(serializer.data)
+
+        mapped_data = self.map_get_data_to_user(serializer.data)
+
+        return Response(mapped_data)
+
+    def map_get_data_to_user(self, data):
+        result                = {}
+        
+        # set key and value pair first
+        result[data["mykey"]] = data["value"]
+        
+        # convert created_at time into unit timestamp and assign into json object
+        result["timestamp"]   = self.get_unix_timestamp_from_datetime(data["created_at"])
+
+        return result
+
+    def get_unix_timestamp_from_datetime(self, datetime_data):
+        datetime_format = '%Y-%m-%dT%H:%M:%S'
+
+        datetime_object = datetime.strptime(datetime_data, datetime_format)
+
+        return int(time.mktime(datetime_object.timetuple()))
