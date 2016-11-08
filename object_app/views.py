@@ -73,12 +73,15 @@ class GenericObjectDetail(APIView):
 
         serializer = GenericObjectSerializer(queryset)
 
-        print(serializer.data)
-
         mapped_data = self.map_get_data_to_user(serializer.data)
 
         return Response(mapped_data)
 
+    """
+    Map Json format {"mykey": "example_key", "value": "example_value", "created_at": "2016-11-08T20:26:30"}
+    to 
+    {"example_key": "example_value", "timestamp": "1231351900"}
+    """
     def map_get_data_to_user(self, data):
         result                = {}
         
@@ -90,6 +93,9 @@ class GenericObjectDetail(APIView):
 
         return result
 
+    """
+    converts datetime 2016-11-08T20:26:30 to unix timestamp
+    """
     def get_unix_timestamp_from_datetime(self, datetime_data):
         datetime_format = '%Y-%m-%dT%H:%M:%S'
 

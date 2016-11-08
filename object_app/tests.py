@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
-from .views import GenericObjectList
+from .views import GenericObjectList, GenericObjectDetail
 import json
 
 # Using the standard RequestFactory API to create a form POST request
@@ -35,3 +35,32 @@ class GenericObjectAPITests(APITestCase):
             "value": "House Martell"
         }
         self.assertEqual(expected, response)
+
+class GenericObjectDetailAPITests(APITestCase):
+
+    def test_map_get_data_to_user(self):
+        obj = GenericObjectDetail()
+        
+        data = {
+            "mykey"      : "Dorne",
+            "value"      : "House Martell",
+            "created_at" : "2016-11-05T20:02:50"
+        }
+
+        result = obj.map_get_data_to_user(data)
+
+        expected = {
+            "Dorne"     : "House Martell",
+            "timestamp" : 1478376170
+        }
+
+        self.assertEqual(expected, result)
+
+    def test_get_unix_timestamp_from_datetime(self):
+        obj      = GenericObjectDetail()
+        data     = "2016-11-05T20:02:50"
+        result   = obj.get_unix_timestamp_from_datetime(data)
+        
+        expected = 1478376170
+
+        self.assertEqual(expected, result)
