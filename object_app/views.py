@@ -79,6 +79,9 @@ class GenericObjectList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+
 class GenericObjectDetail(APIView):
     """
     Retrieve a GenericObject instance.
@@ -98,6 +101,24 @@ class GenericObjectDetail(APIView):
         mapped_data = map_get_data_to_user(serializer.data)
 
         return Response(mapped_data)
+
+
+    def put(self, request, mykey, format=None):
+
+        timestamp = self.request.POST.get('timestamp', None)
+        
+        obj = self.get_latest_object(mykey, timestamp)
+
+        if not obj:
+            return HttpResponseBadRequest("<h1>Bad Request</h1>")
+        
+        mapped_data = map_post_data(request.data)
+        
+        serializer  = GenericObjectSerializer(obj, data=mapped_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(map_get_data_to_user(serializer.data))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_latest_object(self, key, timestamp=None):
         queryset = GenericObject.objects.filter(mykey=key)
