@@ -30,7 +30,7 @@ class GenericObjectList(APIView):
         if len(request.data) != 1:
             return  HttpResponseBadRequest('<h1>Bad Request</h1>')
 
-        post_data = request.data
+        post_data   = request.data
         mapped_data = self.map_post_data(post_data)
 
 
@@ -40,6 +40,9 @@ class GenericObjectList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    """
+    Maps json format of {"example_key": "example_value"} to {"mykey": "example_key", "value": "example_value"}
+    """
     def map_post_data(self, data):
         result = {}
 
