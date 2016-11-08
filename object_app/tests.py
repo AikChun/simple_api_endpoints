@@ -2,7 +2,7 @@ from django.test import TestCase, RequestFactory
 from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory
 from django.contrib.auth.models import User
-from .views import GenericObjectList, GenericObjectDetail
+from .views import GenericObjectList, GenericObjectDetail, map_post_data, map_get_data_to_user, get_unix_timestamp_from_datetime
 import json
 
 # Using the standard RequestFactory API to create a form POST request
@@ -23,7 +23,7 @@ class GenericObjectAPITests(APITestCase):
         obj      = GenericObjectList()
         data     = { "Dorne": "House Martell"}
         
-        response = obj.map_post_data(data)
+        response = map_post_data(data)
         expected = {
             "mykey": "Dorne",
             "value": "House Martell"
@@ -51,7 +51,7 @@ class GenericObjectDetailAPITests(APITestCase):
             "created_at" : "2016-11-05T20:02:50Z"
         }
 
-        result = self.obj.map_get_data_to_user(data)
+        result = map_get_data_to_user(data)
 
         expected = {
             "Dorne"     : "House Martell",
@@ -62,7 +62,7 @@ class GenericObjectDetailAPITests(APITestCase):
 
     def test_get_unix_timestamp_from_datetime(self):
         data     = "2016-11-05T20:02:50Z"
-        result   = self.obj.get_unix_timestamp_from_datetime(data)
+        result   = get_unix_timestamp_from_datetime(data)
         
         expected = 1478376170
 

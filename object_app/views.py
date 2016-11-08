@@ -16,6 +16,43 @@ def index(request):
     template = loader.get_template('index.html')
     return HttpResponse(template.render())
 
+
+def map_post_data(data):
+    result = {}
+
+    for key, value in data.items():
+        result['mykey'] = key
+        result['value'] = value
+
+    return result
+
+"""
+Map Json format {"mykey": "example_key", "value": "example_value", "created_at": "2016-11-08T20:26:30"}
+to 
+{"example_key": "example_value", "timestamp": "1231351900"}
+"""
+def map_get_data_to_user(data):
+    result                = {}
+    
+    # set key and value pair first
+    result[data["mykey"]] = data["value"]
+    
+    # convert created_at time into unit timestamp and assign into json object
+    result["timestamp"]   = get_unix_timestamp_from_datetime(data["created_at"])
+
+    return result
+
+
+"""
+converts datetime 2016-11-08T20:26:30 to unix timestamp
+"""
+def get_unix_timestamp_from_datetime(datetime_data):
+    datetime_format = '%Y-%m-%dT%H:%M:%SZ'
+
+    datetime_object = datetime.strptime(datetime_data, datetime_format)
+
+    return int(time.mktime(datetime_object.timetuple()))
+
 class GenericObjectList(APIView):
     """
     API endpoint that allows users to be viewed or edited.
@@ -32,26 +69,15 @@ class GenericObjectList(APIView):
             return  HttpResponseBadRequest('<h1>Bad Request</h1>')
 
         post_data   = request.data
-        mapped_data = self.map_post_data(post_data)
+        mapped_data = map_post_data(post_data)
 
 
         serializer = GenericObjectSerializer(data=mapped_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(map_get_data_to_user(serializer.data), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    """
-    Maps json format of {"example_key": "example_value"} to {"mykey": "example_key", "value": "example_value"}
-    """
-    def map_post_data(self, data):
-        result = {}
-
-        for key, value in data.items():
-            result['mykey'] = key
-            result['value'] = value
-
-        return result
 
 class GenericObjectDetail(APIView):
     """
@@ -69,7 +95,7 @@ class GenericObjectDetail(APIView):
 
         serializer = GenericObjectSerializer(obj)
 
-        mapped_data = self.map_get_data_to_user(serializer.data)
+        mapped_data = map_get_data_to_user(serializer.data)
 
         return Response(mapped_data)
 
@@ -87,28 +113,3 @@ class GenericObjectDetail(APIView):
 
         return queryset[0]
 
-    """
-    Map Json format {"mykey": "example_key", "value": "example_value", "created_at": "2016-11-08T20:26:30"}
-    to 
-    {"example_key": "example_value", "timestamp": "1231351900"}
-    """
-    def map_get_data_to_user(self, data):
-        result                = {}
-        
-        # set key and value pair first
-        result[data["mykey"]] = data["value"]
-        
-        # convert created_at time into unit timestamp and assign into json object
-        result["timestamp"]   = self.get_unix_timestamp_from_datetime(data["created_at"])
-
-        return result
-
-    """
-    converts datetime 2016-11-08T20:26:30 to unix timestamp
-    """
-    def get_unix_timestamp_from_datetime(self, datetime_data):
-        datetime_format = '%Y-%m-%dT%H:%M:%SZ'
-
-        datetime_object = datetime.strptime(datetime_data, datetime_format)
-
-        return int(time.mktime(datetime_object.timetuple()))
