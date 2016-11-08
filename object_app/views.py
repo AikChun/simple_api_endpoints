@@ -59,23 +59,33 @@ class GenericObjectDetail(APIView):
     """
     renderer_classes = (JSONRenderer, )
     def get(self, request, mykey, format=None):
-        queryset  = GenericObject.objects.filter(mykey=mykey)
+
         timestamp = self.request.query_params.get('timestamp', None)
+
+        obj = self.get_latest_object(mykey, timestamp)
+
+        if not obj:
+            return HttpResponseBadRequest('<h1>Bad Request</h1>')
+
+        serializer = GenericObjectSerializer(obj)
+
+        mapped_data = self.map_get_data_to_user(serializer.data)
+
+        return Response(mapped_data)
+
+    def get_latest_object(self, key, timestamp=None):
+        queryset = GenericObject.objects.filter(mykey=key)
 
         if timestamp is not None:
             timestamp = datetime.utcfromtimestamp(int(timestamp)).isoformat()
             queryset  = queryset.filter(created_at__lte=timestamp)
 
-        if not queryset.count():
-            raise Http404
+        queryset = queryset.order_by('-created_at')
 
-        queryset   = queryset.order_by('-created_at')[0]
+        if len(queryset) <= 0:
+            return False
 
-        serializer = GenericObjectSerializer(queryset)
-
-        mapped_data = self.map_get_data_to_user(serializer.data)
-
-        return Response(mapped_data)
+        return queryset[0]
 
     """
     Map Json format {"mykey": "example_key", "value": "example_value", "created_at": "2016-11-08T20:26:30"}
@@ -97,7 +107,7 @@ class GenericObjectDetail(APIView):
     converts datetime 2016-11-08T20:26:30 to unix timestamp
     """
     def get_unix_timestamp_from_datetime(self, datetime_data):
-        datetime_format = '%Y-%m-%dT%H:%M:%S'
+        datetime_format = '%Y-%m-%dT%H:%M:%SZ'
 
         datetime_object = datetime.strptime(datetime_data, datetime_format)
 
