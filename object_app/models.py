@@ -8,7 +8,7 @@ class GenericObject(models.Model):
     mykey      = models.CharField(max_length=30)
     value      = models.TextField()
     created_at = models.DateTimeField(editable=False)
-    updated_at = models.DateTimeField(default=datetime.now().strftime('%Y-%m-%dT%H:%M:%'))
+    updated_at = models.DateTimeField(default=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
