@@ -47,7 +47,7 @@ def map_get_data_to_user(data):
 converts datetime 2016-11-08T20:26:30 to unix timestamp
 """
 def get_unix_timestamp_from_datetime(datetime_data):
-    datetime_format = '%Y-%m-%dT%H:%M:%SZ'
+    datetime_format = '%Y-%m-%dT%H:%M:%S'
 
     datetime_object = datetime.strptime(datetime_data, datetime_format)
 

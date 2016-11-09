@@ -8,13 +8,13 @@ class GenericObject(models.Model):
     mykey      = models.CharField(max_length=30)
     value      = models.TextField()
     created_at = models.DateTimeField(editable=False)
-    updated_at = models.DateTimeField(default=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    updated_at = models.DateTimeField(default=datetime.now().strftime('%Y-%m-%dT%H:%M:%'))
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
-            self.created_at = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.updated_at = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            self.created_at = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        self.updated_at = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         return super(GenericObject, self).save(*args, **kwargs)
 
     class Meta:
